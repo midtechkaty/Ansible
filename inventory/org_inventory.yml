@@ -1,0 +1,20 @@
+---
+all:
+  children:
+    aap_controller:
+      hosts:
+        localhost:
+          ansible_connection: local
+          ansible_python_interpreter: /usr/bin/python3
+    gitlab:
+      hosts:
+        localhost:
+          ansible_connection: local
+          ansible_python_interpreter: /usr/bin/python3
+    ad_domain:
+      hosts:
+        localhost:
+          ansible_connection: local
+          ansible_python_interpreter: /usr/bin/python3
+  vars:
+    ansible_python_interpreter: /usr/bin/python3 

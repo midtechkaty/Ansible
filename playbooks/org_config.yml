@@ -1,0 +1,82 @@
+---
+- name: Configure Organization in AAP
+  hosts: localhost
+  connection: local
+  vars_files:
+    - "../vaults/{{ env }}.yml"
+  tasks:
+    - name: Create Organization in AAP
+      awx.awx.organization:
+        name: "{{ org_name }}"
+        description: "{{ org_description }}"
+        controller_host: "{{ aap_hostname }}"
+        aap_username: "{{ aap_username }}"
+        aap_password: "{{ aap_password }}"
+        validate_certs: false
+      register: org_result
+
+    - name: Create AD Groups for Organization
+      block:
+        - name: Create Team Execute AD Group
+          win_domain_group:
+            name: "G-APP-AAP-{{ org_name }}-USER"
+            scope: global
+            category: security
+            state: present
+          when: ad_domain is defined
+
+        - name: Create Team Developers AD Group
+          win_domain_group:
+            name: "G-APP-AAP-{{ org_name }}-ADMIN"
+            scope: global
+            category: security
+            state: present
+          when: ad_domain is defined
+
+    - name: Configure GitLab Integration
+      block:
+        - name: Create GitLab Service Account
+          gitlab_user:
+            api_url: "{{ gitlab_url }}"
+            login_token: "{{ gitlab_admin_token }}"
+            username: "{{ org_name }}-gitlab-sa"
+            email: "{{ org_name }}-gitlab-sa@{{ gitlab_domain }}"
+            password: "{{ gitlab_sa_password }}"
+            state: present
+
+        - name: Create GitLab Repository for Org Config
+          gitlab_project:
+            api_url: "{{ gitlab_url }}"
+            login_token: "{{ gitlab_admin_token }}"
+            name: "{{ org_name }}-config"
+            path: "{{ org_name }}-config"
+            description: "Configuration repository for {{ org_name }}"
+            visibility: private
+            state: present
+
+    - name: Configure AAP Service Account
+      block:
+        - name: Create AAP Service Account
+          awx.awx.user:
+            username: "{{ org_name }}-aap-sa"
+            email: "{{ org_name }}-aap-sa@{{ aap_domain }}"
+            password: "{{ aap_sa_password }}"
+            organization: "{{ org_name }}"
+            is_system_auditor: false
+            controller_host: "{{ aap_hostname }}"
+            aap_username: "{{ aap_username }}"
+            aap_password: "{{ aap_password }}"
+            validate_certs: false
+            state: present
+
+        - name: Add Service Account to Team Developers Group
+          win_domain_group_membership:
+            name: "G-APP-AAP-{{ org_name }}-ADMIN"
+            members: "{{ org_name }}-aap-sa"
+            state: present
+          when: ad_domain is defined
+
+    - name: Generate Documentation
+      template:
+        src: templates/org_setup_doc.md.j2
+        dest: "docs/{{ org_name }}-setup.md" 

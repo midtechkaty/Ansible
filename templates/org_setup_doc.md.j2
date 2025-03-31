@@ -1,0 +1,69 @@
+# {{ org_name }} - Ansible Automation Platform Setup Guide
+
+## Overview
+This document provides information about your organization's setup in the Ansible Automation Platform (AAP).
+
+## Access Groups
+Your organization has been configured with the following AD groups:
+
+1. **Team Execute Group**
+   - Name: `G-APP-AAP-{{ org_name }}-USER`
+   - Purpose: For team members who need to execute jobs
+   - Access Level: Execute permissions
+
+2. **Team Developers Group**
+   - Name: `G-APP-AAP-{{ org_name }}-ADMIN`
+   - Purpose: For team members who need administrative access
+   - Access Level: Administrative permissions
+
+## GitLab Integration
+Your organization has been configured with the following GitLab resources:
+
+1. **Configuration Repository**
+   - Repository Name: `{{ org_name }}-config`
+   - Purpose: Stores organization-specific configurations
+   - Access: Private repository
+
+2. **Service Account**
+   - Username: `{{ org_name }}-gitlab-sa`
+   - Purpose: Automated access to GitLab resources
+   - Access Level: Repository-specific permissions
+
+## Ansible Automation Platform Service Account
+Your organization has been configured with the following AAP service account:
+
+1. **Service Account Details**
+   - Username: `{{ org_name }}-aap-sa`
+   - Organization: `{{ org_name }}`
+   - Access Level: Organization-specific permissions
+   - Group Membership: Member of `G-APP-AAP-{{ org_name }}-ADMIN`
+
+## Getting Started
+
+1. **Access Request**
+   - Contact your organization administrator to request access to the appropriate AD groups
+   - Provide your email address and required access level
+
+2. **GitLab Access**
+   - Follow the GitLab access process at: [GitLab Access | DevSecOps Integration Pipeline Services]({{ gitlab_access_url }})
+   - Once approved, you will receive access to your organization's repositories
+
+3. **AAP Access**
+   - After being added to the appropriate AD group, you can access AAP at: `{{ aap_url }}`
+   - Use your corporate credentials to log in
+
+## Support
+For any issues or questions:
+1. Contact your organization administrator
+2. Submit a ticket through the support portal
+3. Reference your organization name: `{{ org_name }}`
+
+## Security Notes
+- Keep your credentials secure
+- Do not share service account credentials
+- Report any security concerns immediately
+
+## Additional Resources
+- [AAP Documentation]({{ aap_docs_url }})
+- [GitLab Documentation]({{ gitlab_docs_url }})
+- [Organization Wiki]({{ org_wiki_url }}) 
